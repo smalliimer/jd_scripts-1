@@ -7,49 +7,41 @@
 ============Quantumultx===============
 [task_local]
 #签到领现金
-2 0 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js, tag=签到领现金, img-url=https://raw.githubusercontent.com/Orz-3/task/master/jd.png, enabled=true
+2 *4 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js, tag=签到领现金, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 
 ================Loon==============
 [Script]
-cron "2 0 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js,tag=签到领现金
+cron "2 * * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js,tag=签到领现金
 
 ===============Surge=================
-签到领现金 = type=cron,cronexp="2 0 * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js
+签到领现金 = type=cron,cronexp="2 4 * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js
 
-============小火箭=========
-签到领现金 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_cash.js, cronexpr="2 0 * * *", timeout=3600, enable=true
  */
 const $ = new Env('签到领现金');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let jdNotify = true;//是否关闭通知，false打开通知推送，true关闭通知推送
+let jdNotify = false;//是否关闭通知，false打开通知推送，true关闭通知推送
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
-let helpAuthor = true;
+let helpAuthor = false;
 const randomCount = $.isNode() ? 20 : 5;
 const inviteCodes = [
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-  `eU9YarnjMv5y8WbVn3JA***w@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ***g@IRs***beyzZP0@IhM-bemwb_Um8Gu6iw`,
-]
+   `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA@eU9YarnjMv5y8WbVn3JA1w@eU9YaOyxZfly9TjQyXER1A@eU9YarjhY_119zvWnnMXgA@eU9Ya-62ZK0h9TvTmXQVgg@eU9Yab22MPkloDuHmCERgg@eU9Ya76wNKlz8G-Gn3IShw@eU9Yau-2Nfly-D2HwyYW3g@Jhgzb-6yb_8m7GrTwnoV0v9E@eU9YaOm3ZKkjo2nQmHMWhA@eU9YaL7hNPl0pGyBzycT0A`,
+ `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA@eU9YarnjMv5y8WbVn3JA1w@eU9YaOyxZfly9TjQyXER1A@eU9YarjhY_119zvWnnMXgA@eU9Ya-62ZK0h9TvTmXQVgg@eU9Yab22MPkloDuHmCERgg@eU9Ya76wNKlz8G-Gn3IShw@eU9Yau-2Nfly-D2HwyYW3g@Jhgzb-6yb_8m7GrTwnoV0v9E@eU9YaOm3ZKkjo2nQmHMWhA@eU9YaL7hNPl0pGyBzycT0A`,
+ `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA@eU9YarnjMv5y8WbVn3JA1w@eU9YaOyxZfly9TjQyXER1A@eU9YarjhY_119zvWnnMXgA@eU9Ya-62ZK0h9TvTmXQVgg@eU9Yab22MPkloDuHmCERgg@eU9Ya76wNKlz8G-Gn3IShw@eU9Yau-2Nfly-D2HwyYW3g@Jhgzb-6yb_8m7GrTwnoV0v9E@eU9YaOm3ZKkjo2nQmHMWhA@eU9YaL7hNPl0pGyBzycT0A`,
+  `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA@eU9YarnjMv5y8WbVn3JA1w@eU9YaOyxZfly9TjQyXER1A@eU9YarjhY_119zvWnnMXgA@eU9Ya-62ZK0h9TvTmXQVgg@eU9Yab22MPkloDuHmCERgg@eU9Ya76wNKlz8G-Gn3IShw@eU9Yau-2Nfly-D2HwyYW3g@Jhgzb-6yb_8m7GrTwnoV0v9E@eU9YaOm3ZKkjo2nQmHMWhA@eU9YaL7hNPl0pGyBzycT0A`,
+   `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA@eU9YaOyxZfly9TjQyXER1A@eU9YarjhY_119zvWnnMXgA@eU9Ya-62ZK0h9TvTmXQVgg@eU9Yab22MPkloDuHmCERgg@eU9Ya76wNKlz8G-Gn3IShw@eU9Yau-2Nfly-D2HwyYW3g@Jhgzb-6yb_8m7GrTwnoV0v9E@eU9YaOm3ZKkjo2nQmHMWhA@eU9YaL7hNPl0pGyBzycT0A`,
+    `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw@eU9Ya-26NP0m8WbRmSYXgA`,
+	 `eU9YM5fPNZ5MryunoyVu@IhM3beiwYvog9ma6iw@eU9YM5fPNZ5MryunoyVu@eU9YaO3hYfkkp2bVy3oQ1g@IR0-aeq7ZPwj@IhM-bemwb_Um8Gu6iw`,
+	 ]
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item])
   })
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
 } else {
-  let cookiesData = $.getdata('CookiesJD') || "[]";
-  cookiesData = jsonParse(cookiesData);
-  cookiesArr = cookiesData.map(item => item.cookie);
-  cookiesArr.reverse();
-  cookiesArr.push(...[$.getdata('CookieJD2'), $.getdata('CookieJD')]);
-  cookiesArr.reverse();
-  cookiesArr = cookiesArr.filter(item => item !== "" && item !== null && item !== undefined);
+  cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 !(async () => {
@@ -296,6 +288,7 @@ function shareCodesFormat() {
       console.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码\n`)
       const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
       $.newShareCodes = inviteCodes[tempIndex].split('@');
+	  $.authorCode=[];
       let authorCode = deepCopy($.authorCode)
       $.newShareCodes = [...(authorCode.map((item, index) => authorCode[index] = item['inviteCode'])), ...$.newShareCodes];
     }
@@ -377,7 +370,7 @@ function getAuthorShareCode() {
       try {
         if (err) {
         } else {
-          $.authorCode = JSON.parse(data)
+          //$.authorCode = JSON.parse(data)
         }
       } catch (e) {
         $.logErr(e, resp)
